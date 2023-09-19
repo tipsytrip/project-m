@@ -2,26 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+@layer component {
+  .button_border {
+    @apply rounded-full outline outline-2 outline-dark-mode-dark dark:outline-white font-semibold  w-fit h-7 py-4 px-4 text-sm flex justify-center items-center hover:scale-105 cursor-pointer transition-transform relative overflow-hidden;
+    transition: all 1000ms;
   }
-}
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  .button_border:hover {
+    @apply shadow-md shadow-dark-mode-dark outline outline-2 outline-dark-mode-dark dark:outline-white scale-110 text-white dark:text-black;
+  }
+
+  .button_border::before {
+    @apply bg-dark-mode-dark dark:bg-white;
+    content: "";
+    position: absolute;
+    left: -50px;
+    top: 0;
+    width: 0;
+    height: 100%;
+    transform: skewX(45deg);
+    z-index: -1;
+    transition: width 400ms;
+  }
+
+  .button_border:hover::before {
+    width: 250%;
+  }
 }
