@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^39.0.2",
+    "@ckeditor/ckeditor5-react": "^6.1.0",
     "autoprefixer": "10.4.14",
     "ckeditor5": "^39.0.2",
     "eslint": "8.44.0",
