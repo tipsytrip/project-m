@@ -38,6 +38,8 @@ module.exports = {
           "blue-2": "#3DA1F6",
           "blue-3": "#A0D3FF",
           "blue-4": "#D8EDFF",
+          "white-1": "#d5d7d9",
+          "white-2": "#ffffff"
         },
       },
     },

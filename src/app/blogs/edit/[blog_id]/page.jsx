@@ -9,6 +9,12 @@ import dynamic from "next/dynamic";
 // import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 // import { CKEditor } from "@ckeditor/ckeditor5-react";
 import { useRouter } from "next/router";
+import SidebarBlogEditor from "@/components/SidebarBlogEditor";
+import SplitPane, { Pane } from "split-pane-react";
+import "split-pane-react/esm/themes/default.css";
+import "./style.css";
+import mountain from "@/img/jpg/mountain.jpg"
+import Image from "next/image";
 
 // import base_url from "../../helpers/base_url";
 
@@ -18,21 +24,22 @@ export default function BlogEditor({ params }) {
   // const router = useRouter();
 
   const editorRef = useRef();
+  const toolBarRef = useRef();
   const [editorLoaded, setEditorLoaded] = useState(false);
-  const { CKEditor, ClassicEditor } = editorRef.current || {};
+  const { CKEditor, DecoupledEditor } = editorRef.current || {};
 
   useEffect(() => {
     editorRef.current = {
       CKEditor: require("@ckeditor/ckeditor5-react").CKEditor, //Added .CKEditor
-      ClassicEditor: require("@ckeditor/ckeditor5-build-classic"),
+      DecoupledEditor: require("@ckeditor/ckeditor5-build-decoupled-document"),
     };
     setEditorLoaded(true);
   }, []);
 
   const [data, setData] = useState("");
 
-  const id = params.id;
-  console.log("id", id);
+  // const id = params.id;
+  // console.log("id", id);
 
   // const [form, setForm] = useState({
   //   name: "",
@@ -77,192 +84,86 @@ export default function BlogEditor({ params }) {
   //   dispatch(getProductById(id));
   // }, [id]);
 
+  const [sizes, setSizes] = useState(["auto", 400]);
+
+  const layoutCSS = {
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
   return (
-    <div className="mx-auto lg:w-10/12 md:w-4/5 w-11/12 bg-white rounded-md min-h-screen py-5 my-10">
-      <div className="p-5">
-        <div className="py-4 text-5xl font-bold text-darkColor text-center">
-          Edit Product
-        </div>
-        <hr className="border-green-800 mx-5" />
-        <div className="px-5 py-5">
-          <div className="overflow-x-auto justify-center flex space-x-8">
-            {/* {data.ProductImages !== undefined ? (
-              data.ProductImages.map((img, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="flex-shrink-0 my-5 w-36 h-36 bg-gray-100 shadow-gray-600 shadow-md text-gray-500 p-2 rounded-md"
-                  >
-                    <div className="text-7xl">
-                      <img
-                        className="w-32 h-32 object-cover"
-                        src={
-                          img
-                            ? img.filename
-                            : "https://www.w3schools.com/howto/img_avatar.png"
-                        }
+    <main className="w-screen h-screen">
+      <SplitPane sizes={sizes} onChange={(sizes) => setSizes(sizes)}>
+        <Pane
+          className=""
+          // className="bg-light-mode-white-1"
+          style={{ ...layoutCSS }}
+        >
+          <div className="flex justify-center h-full w-full">
+            <div className="w-full px-10">
+              <div className="py-4 text-xl font-bold text-darkColor flex justify-between">
+                <label>Title</label>
+                <div className="flex justify-center items-center">
+                  <div>
+                    <Image
+                      className="w-10 h-10 rounded-full"
+                      src={mountain}
+                      alt="Rounded avatar"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div ref={toolBarRef} />
+
+              <div className="border mt-10 bg-light-mode-white-1 overflow-y-auto h-canvas">
+                <div className="p-5 flex justify-center">
+                  {editorLoaded && (
+                    <div className="bg-light-mode-white-2 w-[820px] min-h-[1150px] flex justify-center items-center">
+                      <CKEditor
+                        editor={DecoupledEditor}
+                        data="<p>Content</p>"
+                        onReady={(editor) => {
+                          if (toolBarRef.current.id !== "toolbar-ckeditor5") {
+                            toolBarRef.current.setAttribute(
+                              "id",
+                              "toolbar-ckeditor5"
+                            );
+                            toolBarRef.current.appendChild(
+                              editor.ui.view.toolbar.element
+                            );
+                          }
+                        }}
+                        onChange={(event, editor) => {
+                          const data = editor.getData();
+                          console.log({ event, editor, data });
+                        }}
+                        onBlur={(event, editor) => {
+                          console.log("Blur.", editor);
+                        }}
+                        onFocus={(event, editor) => {
+                          console.log("Focus.", editor);
+                        }}
                       />
                     </div>
-                  </div>
-                );
-              })
-            ) : (
-              <></>
-            )} */}
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        </Pane>
+        <Pane minSize={5} style={{ ...layoutCSS }}>
+          <SidebarBlogEditor />
+        </Pane>
+      </SplitPane>
 
-        <div className="grid md:grid-cols-12 grid-cols-1">
-          <div className="px-5 md:col-span-8 col-span-1">
-            <div className="px-5 py-2">
-              <label className="block text-darkColor text-lg font-bold pb-2">
-                Description
-              </label>
-              {editorLoaded && (
-                <CKEditor
-                  editor={ClassicEditor}
-                  data="<p>Hello from CKEditor&nbsp;5!</p>"
-                  onReady={(editor) => {
-                    // You can store the "editor" and use when it is needed.
-                    console.log("Editor is ready to use!", editor);
-                  }}
-                  onChange={(event, editor) => {
-                    const data = editor.getData();
-                    console.log({ event, editor, data });
-                  }}
-                  onBlur={(event, editor) => {
-                    console.log("Blur.", editor);
-                  }}
-                  onFocus={(event, editor) => {
-                    console.log("Focus.", editor);
-                  }}
-                />
-              )}
-            </div>
-          </div>
-          <div className="px-5 md:col-span-4 col-span-1">
-            <div className="px-5 py-2">
-              <label className="block text-darkColor text-lg font-bold pb-2">
-                Name
-              </label>
-              <input
-                // value={form.name}
-                type="text"
-                className="border hover:border-green-800 focus:border-darkColor p-2 rounded-md bg-lightColor w-full"
-                onChange={(e) => {
-                  // setForm({ ...form, name: e.target.value });
-                }}
-              ></input>
-            </div>
-
-            <div className="px-5 py-2">
-              <label className="block text-darkColor text-lg font-bold pb-2">
-                Price
-              </label>
-              <input
-                // value={form.price}
-                type="number"
-                min="0"
-                maxLength="1000000000"
-                className="border hover:border-green-800 focus:border-darkColor p-2 rounded-md bg-lightColor w-full"
-                onChange={(e) => {
-                  // setForm({ ...form, price: e.target.value });
-                }}
-              ></input>
-            </div>
-            <div className="px-5 py-2">
-              <label className="block text-darkColor text-lg font-bold pb-2">
-                Stock
-              </label>
-              <input
-                // value={form.stock}
-                type="number"
-                min="0"
-                className="border hover:border-green-800 focus:border-darkColor p-2 rounded-md bg-lightColor w-full"
-                onChange={(e) => {
-                  // setForm({ ...form, stock: e.target.value });
-                }}
-              ></input>
-            </div>
-            <div className="px-5 py-2">
-              <label className="block text-darkColor text-lg font-bold pb-2">
-                Brand
-              </label>
-              <input
-                // value={form.brand}
-                type="text"
-                className="border hover:border-green-800 focus:border-darkColor p-2 rounded-md bg-lightColor w-2/5"
-                onChange={(e) => {
-                  // setForm({ ...form, brand: e.target.value });
-                }}
-              ></input>
-            </div>
-            <div className="px-5 py-2">
-              <label className="block text-darkColor text-lg font-bold pb-2">
-                Weight
-              </label>
-              <input
-                // value={form.weight}
-                type="number"
-                min="0"
-                className="border hover:border-green-800 focus:border-darkColor p-2 rounded-md bg-lightColor w-full"
-                onChange={(e) => {
-                  // setForm({ ...form, weight: e.target.value });
-                }}
-              ></input>
-            </div>
-            <div className="px-5 py-2">
-              <label className="block text-darkColor text-lg font-bold pb-2">
-                Category
-              </label>
-              <select
-                // value={form.category}
-                className="border hover:border-green-800 focus:border-darkColor p-2 rounded-md bg-lightColor w-2/5"
-                name="category"
-                id="category"
-                onChange={(e) => {
-                  // setForm({ ...form, category: e.target.value });
-                }}
-              >
-                <option value="business">Business</option>
-                <option value="artist">Artist</option>
-                <option value="gaming">Gaming</option>
-                <option value="school">School</option>
-              </select>
-            </div>
-            <div className="px-5 py-2">
-              <label className="block text-darkColor text-lg font-bold pb-2">
-                Condition
-              </label>
-              <select
-                // value={form.condition}
-                className="border hover:border-green-800 focus:border-darkColor p-2 rounded-md bg-lightColor w-2/5"
-                name="condition"
-                id="condition"
-                onChange={(e) => {
-                  // setForm({ ...form, condition: e.target.value })
-                }}
-              >
-                <option value="new">New</option>
-                <option value="second">Second</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div className="px-5 py-5">
-          <button
-            className="text-2xl py-2 border text-lightColor hover:border-lightColor focus:border-lightColor bg-darkColor p-2 rounded-md w-full"
-            name="condition"
-            id="condition"
-            onClick={() => {
-              // editProductHandler();
-              // navigate("/cms/dashboard");
-            }}
-          >
-            Edit
-          </button>
-        </div>
-      </div>
-    </div>
+      {/* <div className="mx-auto w-11/12 md:w-4/5 lg:w-10/12 bg-white rounded-md min-h-screen py-5 my-10 grid grid-cols-6 absolute">
+        <section className="col-span-5 border">
+          
+        </section>
+        
+      </div> */}
+    </main>
   );
 }

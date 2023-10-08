@@ -1,0 +1,12 @@
+.ck-content input {
+    border: 1px solid black;
+}
+
+.ck-editor__editable_inline {
+    min-height: 1130px;
+    width: 800px
+}
+
+.h-canvas{
+    height:calc(100vh - 180px);
+}
